@@ -20,30 +20,41 @@ set -e
 
 case "$1" in
     configure)
-    MINECRAFT_JAR_SRC=https://s3.amazonaws.com/Minecraft.Download/launcher/Minecraft.jar
+
+    # MINECRAFT_JAR_SRC=https://s3.amazonaws.com/Minecraft.Download/launcher/Minecraft.jar
+    # Nope, we're grabbing a TGZ now (:
+    MINECRAFT_TGZ_SRC=https://launcher.mojang.com/download/Minecraft.tar.gz
+
     # MINECRAFT_ICON_SRC=https://www.minecraft.net/android-icon-192x192.png
     # that's no longer available. I'm replacing it with another one that's...less official but still.
     # It's impressive to me that the entire thing was tripping up on this. -TedsterTech
     MINECRAFT_ICON_SRC=https://icons.iconarchive.com/icons/papirus-team/papirus-apps/256/minecraft-icon.png
 
-    MINECRAFT_JAR_TMP=`tempfile -p minecraft -s .jar`
+    #MINECRAFT_JAR_TMP=`tempfile -p minecraft -s .jar`
+    MINECRAFT_TGZ_TMPDIR=`/tmp/mcinstall`
+    MINECRAFT_TGZ_TMPNAME=`/tmp/mcinstall/mc.tgz`
     MINECRAFT_ICON_TMP=`tempfile -p favicon -s .png`
 
-    MINECRAFT_JAR_DST=/usr/share/minecraft-installer/minecraft.jar
+    #MINECRAFT_JAR_DST=/usr/share/minecraft-installer/minecraft.jar
     MINECRAFT_ICON_DST_XPM=/usr/share/pixmaps/minecraft-installer.xpm
     MINECRAFT_ICON_DST_PNGx32=/usr/share/icons/hicolor/32x32/apps/minecraft-installer.png
     MINECRAFT_ICON_DST_PNGx48=/usr/share/icons/hicolor/48x48/apps/minecraft-installer.png
     MINECRAFT_ICON_DST_PNGx64=/usr/share/icons/hicolor/64x64/apps/minecraft-installer.png
     MINECRAFT_ICON_DST_PNGx128=/usr/share/icons/hicolor/128x128/apps/minecraft-installer.png
 
-
+    mkdir $MINECRAFT_TGZ_TMP
     if [ -e /usr/bin/wget ]; then
-        wget -O $MINECRAFT_JAR_TMP $MINECRAFT_JAR_SRC
+        # wget -O $MINECRAFT_JAR_TMP $MINECRAFT_JAR_SRC
+        wget -O $MINECRAFT_TGZ_SRC $MINECRAFT_TGZ_TMPNAME
         wget -O $MINECRAFT_ICON_TMP $MINECRAFT_ICON_SRC
     else
-        curl $MINECRAFT_JAR_SRC >$MINECRAFT_JAR_TMP
+        # curl $MINECRAFT_JAR_SRC >$MINECRAFT_JAR_TMP
+        curl $MINECRAFT_TGZ_SRC >$MINECRAFT_TGZ_TMPNAME
         curl $MINECRAFT_ICON_SRC >$MINECRAFT_ICON_TMP
     fi
+
+    tar -xzvf $MINECRAFT_TGZ_TMPNAME
+
 
     mv $MINECRAFT_JAR_TMP $MINECRAFT_JAR_DST
 
